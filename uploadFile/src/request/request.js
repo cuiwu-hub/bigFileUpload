@@ -1,10 +1,7 @@
 import axios from 'axios';
 const $axios = axios.create({
-    baseURL: 'http://localhost:8080',
-    timeout: 5000,
-    headers: {
-        "Content-type": "multipart/form-data"
-    }
+    baseURL: 'http://127.0.0.1:8888',
+    timeout: 5000
 })
 export default $axios;
 

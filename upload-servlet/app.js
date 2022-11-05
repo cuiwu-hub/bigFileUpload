@@ -2,23 +2,26 @@ const express = require('express')
 const app = express();
 const cors = require('cors')
 const fs = require('fs')
-const multer = require('multer')
+// const multer = require('multer')
+var multipart = require('connect-multiparty');
+var multipartMiddleware = multipart();
 const bodyParser = require('body-parser')
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'public/uploads')
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname)
-  }
-})
-const upload = multer({storage})
+// var storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, 'public/uploads')
+//   },
+//   filename: function (req, file, cb) {
+//     console.log(file)
+//     cb(null, file.originalname)
+//   }
+// })
+// const upload = multer({storage})
 
-app.use(cors())
+app.use(cors()) // 设置跨域
 app.use(bodyParser.json()); //将请求转换成json格式
-app.use(express.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: false }))
 // 单文件上传formData格式
-app.post('/single_form', upload.single('file'), (req, res) => {
+app.post('/single_form', multipartMiddleware, (req, res) => {
   console.log(req.file)
   res.send('ok')
 })
@@ -35,6 +38,18 @@ app.post('/single_base64', (req, res) => {
     } else {
       res.send('文件上传成功')
     }
+  })
+})
+
+app.post('/single-hash', multipartMiddleware, (req, res) => {
+  fs.readFile(req.files.file.path, function(err, data) {
+    fs.writeFile(`public/uploads/${req.body.fileName}`, data, function(err) {
+      if (err) {
+        res.send(err)
+      } else {
+        res.send('文件上传成功')
+      }
+    })
   })
 })
 
